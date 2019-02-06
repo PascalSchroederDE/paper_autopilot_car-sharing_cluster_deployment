@@ -6,7 +6,66 @@
 
 \section{Locally setup of car sharing app}
 
-\section{Outsourcing kafka client to IBM Cloud message hub}
+For a better understanding of how the car sharing app is working and how the infrastructure for the communication with its underlying services is build up, first the   actual state with local setup of all the single components will be described and explained.
+
+For enabling all functions of the car sharing app, three services need to be setup beforehand. Those are Apache Kafka, OSRM and Mongo Database. First it will be explained how those services can be setup and what they are needed for.
+
+Apache Kafka needs to run on top of a Apache Zookeeper instance. Zookeeper is a a centralized service for maintaining naming and configuration data and providing synchronization within distributed systems. For Kafka it keeps track of status of the cluster nodes as well as its topics, partitions etc.
+
+%https://www.cloudkarafka.com/blog/2018-07-04-cloudkarafka_what_is_zookeeper.html
+
+The Kafka service as well as the Zookeeper are running inside of two separated docker containers. The kafka container listens on port 9092 for predefined topics. In the case of the car sharing app those topics are ``book'' and ``confirm''. A Kafka client inside the car sharing app provides a producer as well as a consumer. The consumer listens on new messages for the ``book'' topic. This way the app is able to receive booking request for the car sharing service, so that customer can request a ride. This ride needs to be confirmed then, which the producer is for. It can produce messages to the ``confirm'' topic, so that the consumer can be informed about the approval of his ride request and additional information like estimated arriving time or car identification.
+
+For testing the Kafka client within the in this essay described work a test web application was developed. This enables entering a topic, a key and a value and producing a message. This message is then produced by a provided producer.  Also the test apps provides two consumers - one listening on the ``book'' topic, another one listening on the ``confirm'' topic. This way it can be controlled, if all produced messages of this topic are successfully produced to the Kafka service and if they can be consumed by the consumer. All consumed messages are shown directly on the Web UI, which allows dynamic changes via the Python SocketIO library.
+
+The scheduler uses this for listening to requests, calculating the best fitting car and its route and confirming the ride after all calculations have been made. In the current state of the project there are two different Schedulers - first the ``real'' scheduler, which is yet only implemented for a simulation, so that it gets its request from a predefined file instead of a Kafka consumer. The other scheduler is a ``dummy'' scheduler, which is used for a demonstration with a real car, for which no complicated scheduling is necessary, because it is only one car. This ``dummy'' scheduler uses kafka for consuming requests and confirms them directly afterwards with an equal message for the ``confirm'' topic.
+
+%check if no kafka client for real scheduler
+
+The second underlying service for the car sharing app is OSRM. As described in chapter INSERT OSRM is for calculating the shortest paths in road networks. For this a map is needed in \acs{PBF} (\acl{PBF}) format. This map then needs to be extracted with a car profile, which determines which routes or streets can be used for this kind of vehicle and which cannot (private road, barriers etc.). This also converts the map into an osrm file. Next this needs to be partitioned into cells and last these cells have to get customized by calculating its routing weights. This OSRM container is also setup within a docker container listening to port 3000 of the localhost for requests for calculating routes on the given map. For running the necessary steps for preparing the map inside the docker container there is a preprocessing shell script prepared, looking like this:
+
+%https://github.com/Project-OSRM/osrm-backend/wiki/Running-OSRM
+
+\begin{lstlisting}
+rm -rf "$(pwd)"/data/*.osrm
+rm -rf "$(pwd)"/data/*.osrm.*
+
+docker run -t --rm -v "$(pwd)"/data:/data osrm/osrm-backend osrm-extract -p /opt/car.lua /data/new-york.osm.pbf
+docker run -t --rm -v "$(pwd)"/data:/data osrm/osrm-backend osrm-partition /data/new-york.osrm
+docker run -t --rm -v "$(pwd)"/data:/data osrm/osrm-backend osrm-customize /data/new-york.osrm
+\end{lstlisting}
+
+The map data are not stored inside the docker container itself but on the local system. This data is then mounted to the docker container, so that it can access it without the need of storing it inside, which keeps the docker container more light weighted.
+
+The third service is a Mongo Database, on which all vehicles, customers, routes and the history are stored. Through this a demo UI can access all necessary informations to represent the vehicles, customers and its calculated routes. This database can be created by a mongo seed, in which all necessary informations are stored in a compact format, so that the database can easily be restored. 
+
+The MongoDB is also running inside a Docker container. The needed seed data are mounted to the Docker container, so that it can access these data stored on the local machine from within the container. Also the created database is created in a local directory which is then mounted to the Docker container. The database is restored by running a mongo-seed shell script looking like this, which first drops the existing table and then recreate a new one by the stored seed:
+
+%check tables
+
+\begin{lstlisting}
+mongo db_rs --eval "db.dropDatabase()"
+mongorestore --db db_rs --dir /tmp/seed/data
+\end{lstlisting}
+
+This script is executed within the docker container by running this command:
+
+\begin{lstlisting}
+docker exec -it cs-mongo sh -c "chmod 700 /tmp/seed/mongo-seed.sh && /tmp/seed/mongo-seed.sh"
+\end{lstlisting}
+
+With all those services running now the car sharing app itself can be started. For the DummyScheduler only the Kafka service is needed. For the simulation all of those services are necessary but the Kafka service. How the communication works can be withdrawn by the following figure, which uses the simulation as example application.
+
+%check dummyscheulder
+
+The car sharing simulation needs two components running - first the demo client and second the demo server. The client runs through predefined requests stored in a json file. Those requests are processed by the scheduler, which calculates the route with OSRM. For optimizing the route the cplex engine is used. After completing the calculations the results are written on the mongo database. The demo server consists out of an API, which can be accesses for requesting the current state of all vehicles, customers and calculated routes. For that it connects to the Mongo database and returns the requested data. This is how the simulation can be visualized on a demo UI, which sends requests to the server and represents the current state on a graphical map.
+
+%cplex?
+
+
+- Kommunikation schaubild
+
+\section{Outsourcing Kafka client to IBM Cloud message hub}
 
 \section{Dockerizing car sharing app and requirements}
 

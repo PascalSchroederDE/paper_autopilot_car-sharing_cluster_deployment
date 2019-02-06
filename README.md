@@ -1,5 +1,4 @@
 # Deployment of Autopilot Car Sharing Service and requirements within IBM Cloud Cluster
-======
 
 The AUTOPILOT project is a Large-Scale Pilot (LSP) by the European Commission. Those LSPs include five pilots as well as two coordination and support actions. Thereby the AUTOPILOT project takes care of using Internet of Things (IoT) for connecting autonomous driving to a larger environment like traffic monitoring systems, car parks, traffic light radars or just other vehicles.
 
