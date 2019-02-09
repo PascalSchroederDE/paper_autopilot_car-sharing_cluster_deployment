@@ -4,6 +4,20 @@
 
 \section{Catalogue of Criteria}
 
+For measuring the success of this project afterwards some criteria need to be defined of what should be achieved during this project.
+
+The longterm goal for the car sharing project is to move away from a local setup to a deployment on a cluster with all its components and dependencies.
+
+The first step for that is to outsource the Kafka client from a local setup to a Cloud service. For that the IBM Cloud Message Hub service can be used. This also enables the possibility to send request not only from the local device, on which the car sharing app itself is running, but also from other applications like a mobile device, which is a necessary requirement for a real use of the car sharing app. Because currently there is no clean way of testing the Kafka client also a web application for testing purposes of the Kafka client should be created. This app should be able to produce messages as well as consuming them and printing them on its UI, so that it can be checked if the production of messages is successfull and, that they can be consumed afterwards.
+
+After that the DummyScheduler should be deployed on the Cluster. This requires to create a container of the car sharing app. Because the DummyScheduler does not use the cplex engine or any other third party service those dont need to be included to the Docker container.
+
+Because the cluster is an internal Research Cluster there are some differences to "normal" Kubernetes cluster. This causes some additional security stepts to be made for deploying apps on it. These additional stepts should be figured out and documented, so that it can be done with other apps without the need of additional research in the future.
+
+If the DummyScheduler is running on the cluster, all its functionalities are working and the Kafka client is outsourced to the IBM Cloud Message Hub, the project can be considered as successful.
+
+If the deployment of the car sharing app, for example with the real scheduler and its requirements, can get continued beyond that, the project can be considered as overachieved.
+
 \section{Locally setup of car sharing app}
 
 For a better understanding of how the car sharing app is working and how the infrastructure for the communication with its underlying services is build up, first the   actual state with local setup of all the single components will be described and explained.
