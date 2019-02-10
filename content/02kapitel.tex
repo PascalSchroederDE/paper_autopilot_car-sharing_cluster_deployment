@@ -3,6 +3,43 @@
 
 \section{Docker} 
 
+To run applications on a cluster it is necessary to isolate these applications inside of a virtual container. Inside of these containers everything is available, what the application needs to get executed, but noting more. It is comparable to a \acs{VM} (\acl{VM}, but much more light weighted. This enables a very light deployment without unnecessary services or applications running in the background, which leads to a very performant execution.
+
+%https://ieeexplore.ieee.org/abstract/document/7093032/
+
+Docker is such a technology for virtualization of containers. It provides a industry-leading container engine technology with an easy way to build containers with a Dockerfile and manage and run those containers easily on your local device.
+
+%https://www.docker.com/why-docker
+
+The main difference between a container and a VM is the weight. While an average VM is hosting an operating system on top of a hypervisor on top of physical hardware. And on top of the OS of the VM the application is running. This affects the performance and the speed of the application in a very negative way, because a lot of unnecessary background proccesses are running. 
+
+Docker solves this problem with a far more lightweight compute resource. The hypervisor of a docker container sits directly on the hosting operating system. This allows setting up several docker containers on only one phsyical machine and enables a high scalability. The differences between a VM and a docker container can be seen on the figure below.
+
+%docker_container_infrastructure
+%https://blog.mikesir87.io/2017/05/docker-is-not-a-hypervisor/
+
+On the left side the infrastructure of a VM can be seen, on the right side the infrastructure of a Docker container. Both needs a physical defice infrastructure and the host operating system. On a VM on this Host Operating System a Hypervisor is running and on this Hypervisor several Guest OS can be running. On those again the apps itself can be executed and the necessary libraries and binaries are running.
+
+In case of a docker container those binaries and libraries are directly running on the operating system without the need of a hypervisor or a complete version of a Guest OS. This also enables the app to be running on top of that. The containers are isolated from each other in different namespaces and own network stacks. This means, that processes running within a container cannot see or interact with processes of other containers and they don't get privileged access to sockets or interfaces of other containers.
+
+%https://docs.docker.com/engine/security/security/
+
+Additionally there is a Docker Daemon running in another process. The Docker Daemon has three main tasks - listening and processing API requests from the Docker client to run Docker commands, managing Docker objects (images, containers, volumes and networks) and parsing Dockerfiles for building docker images.
+
+%file:///C:/Users/IBM_ADMIN/Downloads/20170830_thesis_final.pdf
+
+Those Dockerfiles contains the definition of a basic image, on which the new container should be based on, and then every operation to be executed to build the container. This includes copying necessary files, installing underlying services, compilers and libraries, setting up the einvironment, executing the commands to start the app and more. All those operations creating a new layer in the container. This leads a container to look like can be seen in the figure 2.1.x below.
+
+%docker layer image
+
+This has the advantage, that similar containers, which has equal parts as other, already existing layers, can mount the existing layers from the other container and don't need to build every container for their own again. This makes the build of the docker containers much faster and the single images are smaller, which is especially a great gain for continious inntegration.
+
+%https://tuhrig.de/layering-of-docker-images/
+
+All in all Docker enables the creation of virtualized containers, in which applications can run isolated and independent from its environment. That's why it is a condition for deploying an application on a cluster, because there is no host operating system, on which the applications could be running otherwise.
+
+%check?
+
 \section{Kubernetes cluster solution}
 
 One very common system for managing cluster systems as described in chapter 1.1 is \acl{K8s} - or short \acs{K8s}. Originally developed by Google and now maintained by the Cloud Native Computing Foundation, Kubernetes is an ``open-source platform for managing containerized workloads and services''.\textsuperscript{cmp.\cite{12}} For unterstanding what that means the concept of containers needs to be described first.
@@ -101,8 +138,6 @@ All in all Kubernetes combines all the benefits of cluster applications in one s
 \section{Open Source Routing Machine}
 
 \section{Mongo Database}
-
-\section{IoT Platform}
 
 \section{DRL Car Sharing Service}
 
