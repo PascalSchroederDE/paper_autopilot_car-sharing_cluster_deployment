@@ -135,9 +135,73 @@ All in all Kubernetes combines all the benefits of cluster applications in one s
 
 \section{Apache Kafka}
 
+For a scalable system with a potential of a huge amount of requests every second a realtime streaming platform is necessary. This platform needs to be able to consume messages without blocking the producer even for a second and to produce messages without the need to know the final addressee. Such a streaming platform is Apache Kafka, originally developed by LinkedIn and managed by Apache Software foundation with Open Source license.
+
+%https://books.google.de/books?hl=de&lr=&id=qS9eAQAAQBAJ&oi=fnd&pg=PT6&dq=apache+kafka&ots=ZtW04yIrqG&sig=b2ix-I9ck0zGcM2LfA-zYhEbP9g#v=onepage&q=apache%20kafka&f=false
+
+Apache Kafka thereby characterizes through the possibilities of a very high throughput, so that it can support millions of messages per second, and real time functionalities, which means, that every produces message is immediately visible to consumer threads. Additionally Kafka supports multiple client systems from different platforms like Java, Python, PHP and more and also it supports distribution over a cluster of consumer machines while maintaining its ordering semantics.
+
+%%https://books.google.de/books?hl=de&lr=&id=qS9eAQAAQBAJ&oi=fnd&pg=PT6&dq=apache+kafka&ots=ZtW04yIrqG&sig=b2ix-I9ck0zGcM2LfA-zYhEbP9g#v=onepage&q=apache%20kafka&f=false
+
+For the realization of these characteristics the architecture of Kafka looks like can be seen in figure 2.3.x. Any amount of producers can produce messages to the Kafka brokers. For that it uses a key-value pair as well as a topic, to which it will produce the message. The broker then stores the message with a timestamp to the topic. 
+
+%%https://books.google.de/books?hl=de&lr=&id=qS9eAQAAQBAJ&oi=fnd&pg=PT6&dq=apache+kafka&ots=ZtW04yIrqG&sig=b2ix-I9ck0zGcM2LfA-zYhEbP9g#v=onepage&q=apache%20kafka&f=false
+%image
+
+One broker contains several topics, which can be considered as a logical collection of messages. The topics can be divided into one or more partitions. Those partitions are distributed across multiple brokers, which enabled Kafkas abilitiy for dynamically scaling. For that all brokers are connected to one, big cluster of brokers. This cluster is then managed by a Zookeeper Client, which maintains the confguration information across its nodes.
+
+%https://www.infoworld.com/article/3215165/application-development/how-to-use-apache-kafka-messaging-in-net.html
+
+Consumer read from Kafka topics. This means they are listening on a topic and as soon as a new message is produces to it, the consumer recognizes that and reads the newly produced message.
+
+This makes Apache Kafka to a simple-to-use real time streaming platform, which is very scalable, performant and stable through its cluster structure, which enables replications, distribution and partitioning.
+
+% http://cloudurable.com/blog/kafka-architecture/index.html
+
 \section{Open Source Routing Machine}
 
+One requirement of a car sharing app is of course the routing of a vehicle to its given destination. In the drl car sharing app this is done with \acs{OSRM} (\acl{OSRM}), which is designed for use with OpenStreetMaps.
+
+Before calculating the shortest path from A to B OSRM needs an Open Street Map in osm.pbf format. This map needs then to be prepared, which includes extracting the map, partitioning the graph recursively into cells and customize it by calculating routing weights for all cells. When extracting the map it can also include a vehicle profile, which initialized the map with knowledge about which paths can be taken by the specific vehicle and which cant. For example some routes are only accessible by bikes or pedestrians, others can only be accesses with a car.
+
+%https://github.com/Project-OSRM/osrm-backend
+%https://med.mahidol.ac.th/ceb/sites/default/files/public/pdf/stata_journal/sj16-2.pdf#page=178
+
+For the calculation of the route OSRM describes the map as a graph. In a simple model intersections are described as entities and the roads are used as connections between those entities. Those connections are called edges. Every edge gets a weight added, which denotes the cost to traverse the connection, for example time or distance. The goal is then to calculate the path with the minimum overall weight, when all connections leading from the origin edge to the destination edge are summed together.
+
+%https://blog.mapbox.com/smart-directions-powered-by-osrms-enhanced-graph-model-3ae226974b2
+
+After the visualization of the road network as a weighted graph, the shortest path needs to be found. For that OSRM uses the Dijkstra's Algorithm. This algorithm looks for every node connected to the source node and stores the weight of the connecting edge. In case there are several connecting edges it takes the edge with the smallest weight. Then it continues recursively and looks for every node connected to the new nodes. Every node, for which the connections have been calculated, are added to a set ``visited''. The recursion stops when it reaches a node, which is already in the ``visited'' set. When visiting a new node it stores this to a path log and summing the weight of all the edges it took on its way. This way it calculates the distance between every node by summing the weight of every connection from the origin node to the destination node and storing all nodes visited on the path to it. 
+
+%file:///C:/Users/IBM_ADMIN/Downloads/algorithms%20(1).pdf
+
+This is done for every node of the map when preparing the map for its use. So there is every possible path stored from any node to any other node. When looking for the shortest path OSRM only needs to look for every path leading from the origin node to the destination node and picks the smallest one. The car sharing app uses this routing machine for calculating the shortest path for the vehicles to its destinations.
+
 \section{Mongo Database}
+
+For a performant and scalable processing of huge amounts of data on a Cloud platform a special database technology is necessary. A very popular database technology for that purpose is \acs{MongoDB} (\acl{MongoDB}). MongoDB was developed by the compand 10gen since 2007 and the name Mongo stands for ``Humongous''. 
+
+%https://www.iks-gmbh.com/files/pdf/alvermann_JS_01_11.pdf
+
+MongoDB characterizes through its simple data replication and scalability. For that MongoDB consists out of a cluster of server, which can be easily extended, so that there is no need for upgrading single servers for scaling the database. Additionally MongoDB is a lot faster than relational databases. As an example in figure 2.5.1 it can be seen a comparison between update requests of MongoDB and traditional \acs{MySQL} (\acl{MySQL} requests at different scales.
+
+%https://www.researchgate.net/profile/Nasser_Ghadiri/publication/281629941/figure/fig6/AS:325409976668167@1454595192768/Comparing-the-performance-of-updating-the-records-at-different-scales-times-are-in.png
+
+The x axis is the scale of records to be updated and the y axis shows the time it needs in milliseconds. With a small amount of requests the difference is quite low, but as larger the scale get, the greater the difference between those technologies get. With a scale of 100000 records MongoDB is already more than twice as fast as MySQL (30 milliseconds for MongoDB and 76 milliseconds for MySQL). When increasing the scale to 1000000 records MongoDB is almost four times faster than MySQL.
+%%https://www.researchgate.net/figure/Comparing-the-performance-of-updating-the-records-at-different-scales-times-are-in_fig6_281629941
+
+Other than MySQL databases Mongo stores its data as documents instead of relational tables. These documents are encoded as \acs{BSON} (\acl{BSON}). The data of the documents are stored as key value pairs. The difference between simple key-value stores and a document store is, that the value column in document stores contains semi structured data. This means, that the data does not conform a formal structure of a data model but it has its own structure for separating semantic elements. But this structure can vary from document to document and from row to row and is no subject of a schema. Additionally a single column can contain any amount of attributes. This can be summarized under the characteristic of a schema-free database.
+
+%https://arxiv.org/ftp/arxiv/papers/1307/1307.0191.pdf
+%https://homepages.inf.ed.ac.uk/opb/papers/PODS1997a.pdf
+
+For backup and recovery of data Mongo offers different replication models. The most common one is the master-slave model. There one node of the cluster act as master and every additional one as salve node. The data stored on the master node is automatically replicated on the slave nodes.
+%https://www.iks-gmbh.com/files/pdf/alvermann_JS_01_11.pdf
+
+Additionally Mongo offers a feature called AutoSharding. This features enables to automatically divide a database server to several, physical machines, which allows horizontal scaling. For that the documents are divided in different shards by a specified ShardKey. The documents are then divided to different groups selected by an evenly range of this ShardKey. This doesn't affect the application itself at all, because the MongoDB still represents itself as a single database to the outside.
+%https://www.iks-gmbh.com/files/pdf/alvermann_JS_01_11.pdf
+
+All in all MongoDB combined the advantages of a fast database and a high flexibility because of its missing schemas. This makes it to a very efficient way for storing huge amounts of data.
 
 \section{DRL Car Sharing Service}
 
