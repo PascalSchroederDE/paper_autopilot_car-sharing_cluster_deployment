@@ -8,7 +8,7 @@ The AUTOPILOT project is a \acs{LSP} (\acl{LSP}) by the European Commission. Tho
 
 %https://autopilot-project.eu/wp-content/uploads/sites/16/2018/03/220315_SD_IoT_Brochure_A4_Brief_LowRes.pdf
 
-In this project 45 different partners from 15 different countries across Europe are working together in four different sectors - development of autonomous driving vehicles, development of IoT and networks, collection of data to evaluate the systems and their potential impacts and organisations that will use the results for developing innovative services.\textsuperscript{cmp.\cite{3},\cite{4}}
+In this project 45 different partners from 15 different countries across Europe are working together in four different sectors - development of autonomous driving vehicles, development of IoT and networks, collection of data to evaluate the systems and their potential impacts as well as organisations that will use the results for developing innovative services.\textsuperscript{cmp.\cite{3},\cite{4}}
 
 %https://autopilot-project.eu/facts-and-figures/
 %https://autopilot-project.eu/partners/
@@ -27,7 +27,6 @@ For proving the functionality of this scheduler it is necessary to test it in di
 
 This also needs to be based on a reliable and scalable infrastructure with enough resources to execute all the necessary calculations. One modern approach for this are cluster systems, of which advantages will be described in chapter 1.2.
 
-
 \section{Advantage of cluster systems}
 
 Cluster systems are two or more computers connected to each other, so that they can share their resources and can be viewed as one system. Therefore they can be connected physically as well as virtually. Using such a cluster system is typically much more cost-efficient compared to using a single computer, which provides about the same power. But the advantage of such systems doesn't end with a better cost-efficiency.\textsuperscript{cmp.\cite{7}}
@@ -41,7 +40,7 @@ On the one hand, there are ``Load balancing'' cluster configurations. Load balan
 
 %Aho, Alfred V.; Blum, Edward K. (2011). Computer Science: The Hardware, Software and Heart of It.
 
-Furthermore there are ``High availability'' clusters, which are designed to prevent a total break down of the system. For that there are several redundant nodes connected to the system. That means, that when one component fails, a redundant node of this component is used to provide the service. Thereby availability is ensured even if one component fails. The more redundant nodes are used the better will be the availability of a system. To provide an example: If a system has an availability of 90\% it has a downtime of 10\%, which means that the system is not available on 36.53 days per year. If there is a second, redundant and independent node connected to the cluster, which acts as a stand-in for the first system in case of a failure, the downtime of those two systems has to be combined. That means that this cluster would only fail if there is an overlap between the downtimes of those two systems. Resulting of a downtime of 10\% of each system there is a combined downtime of 1\% or 3.65 days per year. If there is a third system connected to the cluster, the downtime will be reduced to 0.1\% or 8.77 hours per year and so on. The job of ``High availability'' clusters is in that to reduce the downtime of the system and to provide a working system almost any time.\textsuperscript{cmp.\cite{9}}
+Furthermore there are ``High availability'' clusters, which are designed to prevent a total break down of the system. For that there are several redundant nodes connected to the system. That means, that when one component fails, a redundant node of this component is used to provide the service. Thereby availability is ensured even if one component fails. The more redundant nodes are used the better will be the availability of a system. To provide an example: If a system has an availability of 90\% it has a downtime of 10\%, which means that the system is not available on 36.53 days per year. If there is a second, redundant and independent node connected to the cluster, which acts as a stand-in for the first system in case of a failure, the downtime of those two systems has to be combined. That means that this cluster would only fail if there is an overlap between the downtimes of those two systems. Resulting of a downtime of 10\% of each system there is a combined downtime of 1\% or 3.65 days per year. If there is a third system connected to the cluster, the downtime will be reduced to 0.1\% or 8.77 hours per year and so on. The job of ``High availability'' clusters accordingly is to reduce the downtime of the system and to provide a working system at almost any time.\textsuperscript{cmp.\cite{9}}
 
 %https://patents.google.com/patent/US6944785B2/en
 
@@ -60,9 +59,9 @@ But those advantages don't have to stand alone, but they can also be combined, s
 
 \section{Project objective}
 
-The objective of this essay is first to describe the car-sharing part of the AUTOPILOT project and all its underlying technologies. Those include Apache Kafka, \acs{OSRM} (\acl{OSRM} and MongoDB. Also the IoT Platform will be described roughly. For understanding the need of deploying these apps inside a cluster, the Kubernetes cluster solution will be portrayed.
+The objective of this essay is first to describe the car-sharing part of the AUTOPILOT project and all its underlying technologies. Those include Docker, Apache Kafka, \acs{OSRM} (\acl{OSRM} and MongoDB.  For understanding the need of deploying these apps inside a cluster, the Kubernetes cluster solution will be portrayed as well.
 
-In the next step the it will be explained how to deploy the car sharing service and its dependencies on a cluster and how a communication between them can be established. For that first it will be described how this project can be setup locally and afterwards how to containerize those applications with Docker, before the deployment itself will be explained. Afterwards it will be shown how this setup can be tested with a simulation running in a locally hosted \acs{UI} (\acl{UI}).
+In the next step it will be explained how to deploy the car sharing service and its dependencies on a cluster and how a communication between them can be established. For that first it will be described how this project can be setup locally and how to containerize those applications with Docker, before the deployment itself will be explained. Afterwards it will be shown how to communicate to this application from the outside for example to test this setup with a simulation on a locally hosted \acs{UI} (\acl{UI}).
 
 Last those results will be shown and discussed based on previously determined criteria. 
 
