@@ -3,7 +3,7 @@
 
 \section{Docker} 
 
-To run applications on a cluster it is necessary to isolate these applications inside of a virtual container. Inside of these containers everything is available, what the application needs to get executed, but noting more. It is comparable to a \acs{VM} (\acl{VM}, but much more light weighted. This enables a very light deployment without unnecessary services or applications running in the background, which leads to a very performant execution.
+To run applications on a cluster it is necessary to isolate these applications inside of a virtual container. Inside of these containers everything is available, what the application needs to get executed, but noting more. It is comparable to a \acs{VM} (\acl{VM}), but much more light weighted. This enables a very light deployment without unnecessary services or applications running in the background, which leads to a very performant execution.
 
 %https://ieeexplore.ieee.org/abstract/document/7093032/
 
@@ -13,9 +13,15 @@ Docker is such a technology for virtualization of containers. It provides a indu
 
 The main difference between a container and a VM is the weight. While an average VM is hosting an operating system on top of a hypervisor on top of physical hardware. And on top of the OS of the VM the application is running. This affects the performance and the speed of the application in a very negative way, because a lot of unnecessary background proccesses are running. 
 
-Docker solves this problem with a far more lightweight compute resource. The hypervisor of a docker container sits directly on the hosting operating system. This allows setting up several docker containers on only one phsyical machine and enables a high scalability. The differences between a VM and a docker container can be seen on the figure below.
+Docker solves this problem with a far more lightweight compute resource. The hypervisor of a docker container sits directly on the hosting operating system. This allows setting up several docker containers on only one phsyical machine and enables a high scalability. The differences between a VM and a docker container can be seen on the figure 2.1.1 below.
 
-%docker_container_infrastructure
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth/5*4]{images/docker_vm_differences.png}
+
+\textsuperscript{Figure 2.1.1 Comparison Docker container and VM}\\
+\textsuperscript{Retrieved from \cite{}}
+\end{figure}
 %https://blog.mikesir87.io/2017/05/docker-is-not-a-hypervisor/
 
 On the left side the infrastructure of a VM can be seen, on the right side the infrastructure of a Docker container. Both needs a physical defice infrastructure and the host operating system. On a VM on this Host Operating System a Hypervisor is running and on this Hypervisor several Guest OS can be running. On those again the apps itself can be executed and the necessary libraries and binaries are running.
@@ -28,9 +34,16 @@ Additionally there is a Docker Daemon running in another process. The Docker Dae
 
 %file:///C:/Users/IBM_ADMIN/Downloads/20170830_thesis_final.pdf
 
-Those Dockerfiles contains the definition of a basic image, on which the new container should be based on, and then every operation to be executed to build the container. This includes copying necessary files, installing underlying services, compilers and libraries, setting up the einvironment, executing the commands to start the app and more. All those operations creating a new layer in the container. This leads a container to look like can be seen in the figure 2.1.x below.
+Those Dockerfiles contains the definition of a basic image, on which the new container should be based on, and then every operation to be executed to build the container. This includes copying necessary files, installing underlying services, compilers and libraries, setting up the environment, executing the commands to start the app and more. All those operations creating a new layer in the container. This leads a container to look like can be seen in the figure 2.1.2 with several layers with a unique id off different sizes based on one basic image like an Ubuntu image.
 
-%docker layer image
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth/5*3]{images/docker_layer.png}
+
+\textsuperscript{Figure 2.1.2 Docker container layers}\\
+\textsuperscript{Retrieved from \cite{}}
+\end{figure}
+%https://adeeshfulay.wordpress.com/2017/09/08/understanding-docker-images-and-layers/
 
 This has the advantage, that similar containers, which has equal parts as other, already existing layers, can mount the existing layers from the other container and don't need to build every container for their own again. This makes the build of the docker containers much faster and the single images are smaller, which is especially a great gain for continious inntegration.
 
@@ -82,16 +95,7 @@ The Controller Manager is a daemon, which embeds all of the Kubernetes controlle
 
 The scheduler manages the binding of pods to nodes. Therefore it watches for new deployments as well as for old ones to create new pods if a new deployment is created or recreating a pod whenever a pod gets destroyed. The scheduler organizes the allocation of the pods within the cluster on the basis of available ressources of the pods. That means, that it always create pods, where the most resources are available, or reorganize the allocation if there is a change in the resource allocation of the cluster.\textsuperscript{cmp.\cite{13}, \cite{16}}%??
 
-Figure 2.1.3 shows the way the Scheduler works, when new nodes are connected. As long as there are only two nodes and four pods need to be deployed, it allocates those four pods to the two nodes . As soon as there are more nodes connected, the scheduler recognizes free resources and reallocate the pods to these new nodes.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=\textwidth/5*3]{images/kubernetes_scheduler.png}
-
-\textsuperscript{Figure 2.1.3 Kubernetes API Server watcher sequence diagram} \\
-\textsuperscript{Based on retrieved information from \cite{17}}
-\end{figure}
-%https://www.informatik-aktuell.de/fileadmin/_processed_/b/6/csm_K8s_abb1_fricke_b5ce6bd912.png
+For example if we have four pods deployed on our cluster - as long as there are only two nodes, it allocates those four pods to the two nodes in pairs of two. As soon as there are more nodes connected, the scheduler recognizes free resources and reallocate the pods to these new nodes, so that we have one pod on each node.
 
 The etcd is a key-value store, which stores the configuration data and the condition of the Kubernetes cluster. The etcd also contains a watch feature, which listens to changes to keys and triggers the API server to perform all necessary actions to move the current state of the cluster towards the desired state.\textsuperscript{cmp.\cite{13}, \cite{16}}
 
@@ -103,32 +107,22 @@ The cAdvisor measures the usage of CPU-resources as well as demanded memory on t
 
 The kube-proxy is a daemon, that runs as a simple network proxy to provide the possibility of communicating to that node within the cluster. Additionally it runs a load balancer for the services on that node.\textsuperscript{cmp.\cite{13}, \cite{16}}
 
-Through this architecture Kubernetes enables different possibilities to deploy pods within the cluster. The simplest one is to deploy a specific pod directly through the 
-\begin{lstlisting}[caption={Create Kubernetes pod},captionpos=b]
-kubectl create -f `image\_path'
-\end{lstlisting}
-command. This deploys the pod described in the file, but it doesn't ensure the failure safety. That means if the pod gets destroyed for some reason, no matter if it has been destroyed by accident or intended, it won't be recreated and deployed again automatically. 
+Through this architecture Kubernetes enables different possibilities to deploy pods within the cluster. The simplest one is to deploy a specific pod directly. This deploys the pod described in a file, but it doesn't ensure the failure safety. That means if the pod gets destroyed for some reason, no matter if it has been destroyed by accident or intended, it won't be recreated and deployed again automatically. 
 
 %1
 %2 https://medium.com/jorgeacetozi/kubernetes-master-components-etcd-api-server-controller-manager-and-scheduler-3a0179fc8186
 
-Another possibility is to create a deployment. Therefore the image has to be embedded within a replicaset and this replicaset within a deployment. If this deployment is created, it will automatically create every pod of the replicaset. If one pod gets terminated, no matter if manually or because of an error, it will be directly recreated and deployed.\textsuperscript{cmp.\cite{13}, \cite{18}}
+Another possibility is to create a deployment. Therefore the image has to be embedded within a replicaset and this replicaset within a deployment. If this deployment is created, it will automatically create every pod of the replicaset. If one pod gets terminated, no matter if manually or because of an error, it will be directly recreated and deployed. This also enables dynamical rolling updates for deploying a new version of a pod.\textsuperscript{cmp.\cite{13}, \cite{18}}
 
-This procedure also enables the possibility to execute dynamical rolling updates. If you execute the command
-\begin{lstlisting}[caption={Create Kubernetes deployment},captionpos=b]
-kubectl set image deployment/name-deployment name=name:1.1.1
-\end{lstlisting}
-Kubernetes will start a Rolling Update. This causes the creation of a new replicaset, which uses pods of the new version. While the new replicaset will be scaled up, the old one will be scaled down step by step. This enables the maintenance of a deployment even while an update is enrolled, so that the users can still use the services while those are updating. That means, that there is never a need of a system to shut down because of an update, which needs to be enrolled, and the system guarantees its high availability.\textsuperscript{cmp.\cite{13}, \cite{18}}
+Additionally Services can be created on a cluster. Services are used to enable the usage of pods from outside the container. Therefore it gets the pod from the targetPort of the belonging node and creates a random port on this node. This port serves as endpoint for the LoadBalancer. Through this, every pod on the cluster can now communicate with this pod. For a communication to the outside of the cluster this port needs to be exposed afterwards, for example with an ingress. \textsuperscript{cmp.\cite{13}, \cite{18}}
 
-A third possibility to deploy pods are services. Services are used to enable the usage of pods from outside the cluster. Therefore it gets the pod from the targetPort of the belonging node and creates a random port on this node. This port serves as endpoint for the LoadBalancer. Through this, everybody can now communicate with this pod.\textsuperscript{cmp.\cite{13}, \cite{18}}
-
-This is how Kubernetes ensures High Availability as well as Load Balancing at the same time. Through the possibility of replicate every pod several times it is ensured that whenever one pod fails for some reason, another is already prepared to help out and take over the job. Even the master can and should be replicated to ensure a functional system, even if one master has been destroyed. For production environment it's recommended to have 3, 5 or 7 master nodes running at the same time. For facilitating the High Availability almost every unit of a Kubernetes cluster is stateless and could be run redundant in several instances. Only the etcd key value store is stateful. For solving that problem in case of failure of the node, which owns the etcd, there is a leader election between all master node replicas to determine the new leading etcd.\textsuperscript{cmp.\cite{13}, \cite{18}}
+This is how Kubernetes ensures High Availability as well as Load Balancing at the same time. Through the possibility of replicate every pod several times it is ensured that whenever one pod fails for some reason, another is already prepared to help out and take over the job. Even the master can and should be replicated to ensure a functional system, even if one master has been destroyed.\textsuperscript{cmp.\cite{13}, \cite{18}}
 
 %1
 %2
 %https://deis.com/blog/2016/kubernetes-overview-pt-1/
 
-All in all Kubernetes combines all the benefits of cluster applications in one software. High availability as well as load balancing is guaranteed and it also ensures a high scalability, rolling updates and auto-scaling. Compared to other cluster systems, like Docker swarm, it has the biggest community and it can support clusters of up to 5000 nodes, which enables using Kubernetes even for very big clusters. For example the whole Google Cloud System runs on a Kubernetes cluster. Performing tests of Kubernetes shows, that in 99\% the API responses in less than one second and also their pods start in less than five seconds in 99\% when starting containers with pre pulled images. This all makes Kubernetes maybe one of the most flexible and fastest cluster systems. In exchange for that flexibility it is more difficult to set it up, because you have to do it all on your own. But only that way it can be ensured, that it runs fast and flexible in the same time, which is the reason for Kubernetes being so popular.\textsuperscript{cmp.\cite{19}, \cite{20}}
+All in all Kubernetes combines all the benefits of cluster applications in one software. High availability as well as load balancing is guaranteed and it also ensures a high scalability, rolling updates and auto-scaling. This makes Kubernetes one of the most flexible and fastest cluster systems. In exchange for that flexibility it is more difficult to set it up compared to other cluster systems, because you have to do it all on your own. But only that way it can be ensured, that it runs fast and flexible in the same time, which is the reason for Kubernetes being so popular.\textsuperscript{cmp.\cite{19}, \cite{20}}
 
 %https://platform9.com/blog/kubernetes-docker-swarm-compared
 %https://www.redhat.com/de/topics/containers/what-is-kubernetes ???
@@ -143,10 +137,17 @@ Apache Kafka thereby characterizes through the possibilities of a very high thro
 
 %%https://books.google.de/books?hl=de&lr=&id=qS9eAQAAQBAJ&oi=fnd&pg=PT6&dq=apache+kafka&ots=ZtW04yIrqG&sig=b2ix-I9ck0zGcM2LfA-zYhEbP9g#v=onepage&q=apache%20kafka&f=false
 
-For the realization of these characteristics the architecture of Kafka looks like can be seen in figure 2.3.x. Any amount of producers can produce messages to the Kafka brokers. For that it uses a key-value pair as well as a topic, to which it will produce the message. The broker then stores the message with a timestamp to the topic. 
+For the realization of these characteristics the architecture of Kafka looks like can be seen in figure 2.3.1. Any amount of producers can produce messages to the Kafka brokers. For that it uses a key-value pair as well as a topic, to which it will produce the message. The broker then stores the message with a timestamp to the topic. 
 
 %%https://books.google.de/books?hl=de&lr=&id=qS9eAQAAQBAJ&oi=fnd&pg=PT6&dq=apache+kafka&ots=ZtW04yIrqG&sig=b2ix-I9ck0zGcM2LfA-zYhEbP9g#v=onepage&q=apache%20kafka&f=false
-%image
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth/5*4]{images/kafka_architecture.png}
+
+\textsuperscript{Figure 2.3.1 Apache Kafka Architecture}\\
+\textsuperscript{Retrieved from \cite{}}
+\end{figure}
+%https://www.infoworld.com/article/3215165/application-development/how-to-use-apache-kafka-messaging-in-net.html
 
 One broker contains several topics, which can be considered as a logical collection of messages. The topics can be divided into one or more partitions. Those partitions are distributed across multiple brokers, which enabled Kafkas abilitiy for dynamically scaling. For that all brokers are connected to one, big cluster of brokers. This cluster is then managed by a Zookeeper Client, which maintains the confguration information across its nodes.
 
@@ -183,14 +184,22 @@ For a performant and scalable processing of huge amounts of data on a Cloud plat
 
 %https://www.iks-gmbh.com/files/pdf/alvermann_JS_01_11.pdf
 
-MongoDB characterizes through its simple data replication and scalability. For that MongoDB consists out of a cluster of server, which can be easily extended, so that there is no need for upgrading single servers for scaling the database. Additionally MongoDB is a lot faster than relational databases. As an example in figure 2.5.1 it can be seen a comparison between update requests of MongoDB and traditional \acs{MySQL} (\acl{MySQL} requests at different scales.
+MongoDB characterizes through its simple data replication and scalability. For that MongoDB consists out of a cluster of server, which can be easily extended, so that there is no need for upgrading single servers for scaling the database. Additionally MongoDB is a lot faster than relational databases. As an example in figure 2.5.1 it can be seen a comparison between update requests of MongoDB and traditional \acs{SQL} (\acl{SQL}) requests at different scales.
 
-%https://www.researchgate.net/profile/Nasser_Ghadiri/publication/281629941/figure/fig6/AS:325409976668167@1454595192768/Comparing-the-performance-of-updating-the-records-at-different-scales-times-are-in.png
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{images/mongo_sql_comparison.png}
 
-The x axis is the scale of records to be updated and the y axis shows the time it needs in milliseconds. With a small amount of requests the difference is quite low, but as larger the scale get, the greater the difference between those technologies get. With a scale of 100000 records MongoDB is already more than twice as fast as MySQL (30 milliseconds for MongoDB and 76 milliseconds for MySQL). When increasing the scale to 1000000 records MongoDB is almost four times faster than MySQL.
+\textsuperscript{Figure 2.5.1 Performance comparison Mongo and SQL}\\
+\textsuperscript{Based on retrieved information from \cite{}}
+\end{figure}
+
 %%https://www.researchgate.net/figure/Comparing-the-performance-of-updating-the-records-at-different-scales-times-are-in_fig6_281629941
 
-Other than MySQL databases Mongo stores its data as documents instead of relational tables. These documents are encoded as \acs{BSON} (\acl{BSON}). The data of the documents are stored as key value pairs. The difference between simple key-value stores and a document store is, that the value column in document stores contains semi structured data. This means, that the data does not conform a formal structure of a data model but it has its own structure for separating semantic elements. But this structure can vary from document to document and from row to row and is no subject of a schema. Additionally a single column can contain any amount of attributes. This can be summarized under the characteristic of a schema-free database.
+The x axis is the scale of records to be updated and the y axis shows the time it needs in milliseconds. With a small amount of requests the difference is quite low, but as larger the scale get, the greater the difference between those technologies get. With a scale of 100000 records MongoDB is already more than twice as fast as a SQL Server (30 milliseconds for MongoDB and 76 milliseconds for MySQL). When increasing the scale to 1000000 records MongoDB is almost four times faster than SQL.
+%%https://www.researchgate.net/figure/Comparing-the-performance-of-updating-the-records-at-different-scales-times-are-in_fig6_281629941
+
+Different to SQL databases Mongo stores its data as documents instead of relational tables. These documents are encoded as \acs{BSON} (\acl{BSON}). The data of the documents are stored as key value pairs. The difference between simple key-value stores and a document store is, that the value column in document stores contains semi structured data. This means, that the data does not conform a formal structure of a data model but it has its own structure for separating semantic elements. But this structure can vary from document to document and from row to row and is no subject of a schema. Additionally a single column can contain any amount of attributes. This can be summarized under the characteristic of a schema-free database.
 
 %https://arxiv.org/ftp/arxiv/papers/1307/1307.0191.pdf
 %https://homepages.inf.ed.ac.uk/opb/papers/PODS1997a.pdf
@@ -205,4 +214,45 @@ All in all MongoDB combined the advantages of a fast database and a high flexibi
 
 \section{DRL Car Sharing Service}
 
-%\section{CPLEX}
+The autonomous driving is one big future technology many companies are working on. This is not only changing the way of vehicles driving, but it will affect the whole way of mobility in everybodys life. A complete new infrastructure is needed with connecting vehicles, buildings, cameras, sensors, streets and people. A lot of new services will come up. To prepare for this the European commission adopted the Autopilot project.
+
+This projects goal is to build an infrastructure for connecting vehicles and an IoT eco system as well as to create new services coming up through the new way of mobility. This includes for example route optimisation of automated driving vehicles based on (predicted) traffic, automated valet parking, chauffeur services for tourists, platooning, which means that one vehicle follows another one automatically, or car sharing services. 
+
+For that the Autopilot projects architecture consists out of four layers as can be seen in figure 2.6.1. The first layer is called ``Things layer''. It includes all IoT devices like vehicles, cameras, road side units, sensors etc. as well as external services. This should enable the system to win information about traffic, environment and so on, so that it can for example optimize the route to be taken. Cameras can be used for example to win an overview of how crowded a street is currently. An example for an external service is Twitter, with which you could win information about a traffic jam or accident when people are sharing their information via this service.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth/5*4]{images/autopilot_layers.png}
+
+\textsuperscript{Figure 2.6.1 Autopilot layers}\\
+\textsuperscript{Retrieved from \cite{}}
+\end{figure}
+%ITS 19
+
+The second layer is the ``Network layer'', which enables communication throughout the whole IoT ecosystem. It offers three different way of communication. End-To-End Communication, which routes data packets through various parts in the network till it reaches its destination. Alternatively Hop-by-Hop Communication can be used, which specifically defines each hop (IP Address) that should be part of the path starting from the origin ending with the destination. Also communication only within a Network is possible.
+
+Third there is the ``ioT'' layer''. This layer enables the IoT functionalities. For that there are different building blocks - analytics, process and service management, context management, semantics, device management and security. They all have different functionalities and tasks to full fill with the data and the IoT Devices.
+
+Last the fourth layer is the Application layer. This layer contains the services described above itself, like car sharing or platooning.
+
+%ITS 19
+
+The project discussed in this work dealt with the car sharing service developed in the IBM Dublin Research Lab. Car Sharing services are already a popular service in nowadays world of mobility. The services task can be either to find the closes available car for a customer and assign i or to drive the closest car directly to the customer. Then it is either possible to share a ride with other customers or with explicitly stated drivers or where the customer gets a car assigned, which he can use for himself for a given period of time.
+
+In the future there will be one more possibility - to get the vehicle to the customer without the need of a driver but with an autonomous driving car. The car sharing service of the Autopilot app should enable this possibility combined with all the features of the IoT environment like traffic information. For that the service only needs to know the location of the customer and his origin as well as his destination and the time for which he is looking for a ride. Also the customer can enter if he wants to drive alone or if he is willing to share a ride. The car sharing service will then compute the costs and the times of the ride and match a car to a customer, which will pick him up and drop him off at his destination.
+
+For handling all necessary informations the architecture shown in figure 2.6.2 is build for. In the central point there is the car sharing scheduler itself. This scheduler listens to an Apache Kafka client to the book topic. For this topic the customer can produce messages, for example via an app. Then the car sharing scheduler is looking for available cars through subscribing to the positions of the car in the Watson IoT Platform. To this platform vehicles publish their position and other important information like boarded customers, destinations and so on. Then it calculate the optimal route with the help of OSRM described in chapter 2.4. For that OSRM also integrates the Events published to the Watson IoT Platform. Those events can come from other IoT Vehicles, cameras, webservices or other traffic information systems like sensors or traffic lights. After the calculation of the optimal route the scheduler summon the car to the position of the customer to pick him up and take him to his destination. For that it publishes the command to the Watson IoT platform. The car subscribes to this type of information, registers the command and execute the order. Also the scheduler produces a confirmation message to the Kafka client, so that the customer can see on his app, that his ride is successfully booked. At the same time all the executed procedures are logged to a MongoDB.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth/5*4]{images/car_sharing_architecture.png}
+
+\textsuperscript{Figure 2.6.2 DRL Car Sharing App Architecture}\\
+\textsuperscript{Internal Source}
+\end{figure}
+
+This enables a very flexible way of a car sharing service combined with a well informed system through the IoT platform, which helps finding the best way to a specific destination. In the future this way of mobility will become more and more important, because the parking situation in cities will be even more difficult and not everybody can afford a car for his own. That's why sharing cars is a very popular way already nowadays and will become even more popular in the future.
+
+%initial specification
+
+%- conclusion

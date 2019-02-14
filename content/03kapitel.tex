@@ -70,14 +70,16 @@ docker exec -it cs-mongo sh -c "chmod 700 /tmp/seed/mongo-seed.sh && /tmp/seed/m
 
 With all those services running now the car sharing app itself can be started. For the DummyScheduler only the Kafka service is needed. For the simulation all of those services are necessary but the Kafka service. How the communication works can be withdrawn by the following figure, which uses the simulation as example application.
 
-%check dummyscheulder
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth/5*4]{images/simulation_communication.png}
 
-The car sharing simulation needs two components running - first the demo client and second the demo server. The client runs through predefined requests stored in a json file. Those requests are processed by the scheduler, which calculates the route with OSRM. For optimizing the route the cplex engine is used. After completing the calculations the results are written on the mongo database. The demo server consists out of an API, which can be accesses for requesting the current state of all vehicles, customers and calculated routes. For that it connects to the Mongo database and returns the requested data. This is how the simulation can be visualized on a demo UI, which sends requests to the server and represents the current state on a graphical map.
+\textsuperscript{Figure 3.2.1 Simulation communication with services}\\
+\end{figure}
+
+The car sharing simulation needs two components running - first the demo client and second the demo server. The client runs through predefined requests stored in a json file. Those requests are processed by the scheduler, which calculates the route with OSRM. For optimizing the route the cplex engine is used. After completing the calculations the results are written to the mongo database. The demo server consists out of an API, which can be accesses for requesting the current state of all vehicles, customers and calculated routes. For that it connects to the Mongo database and returns the requested data. This is how the simulation can be visualized on a demo UI, which sends requests to the server and represents the current state on a graphical map.
 
 %cplex?
-
-
-- Kommunikation schaubild
 
 \section{Outsourcing Kafka client to IBM Cloud message hub}
 
