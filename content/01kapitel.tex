@@ -48,10 +48,10 @@ Furthermore there are ``High availability'' clusters, which are designed to prev
 \centering
 \includegraphics[width=\textwidth/25*10]{images/ha_cluster_architecture.png}
 
-\textsuperscript{Figure 1.1.1 ``High availability'' cluster architecture}
+\textsuperscript{Figure 1.2.1 ``High availability'' cluster architecture}
 \end{figure}
 
-Figure 1.1 shows an example architecture of such a ``High availability'' cluster. There are two servers, whereby one server is a replication of the other one. The request router handles the incoming requests and leads them to the active server. If there is a system failure of the active server, the manager will recognize that, and sends a message to the request router to change the request address to the other server. From now on this server will deal with all the requests. Also there is a shared storage for both of the servers in one database. No matter which one is active they can both access this database.\textsuperscript{cmp.\cite{10}}
+Figure 1.2.1 shows an example architecture of such a ``High availability'' cluster. There are two servers, whereby one server is a replication of the other one. The request router handles the incoming requests and leads them to the active server. If there is a system failure of the active server, the manager will recognize that, and sends a message to the request router to change the request address to the other server. From now on this server will deal with all the requests. Also there is a shared storage for both of the servers in one database. No matter which one is active they can both access this database.\textsuperscript{cmp.\cite{10}}
 
 %https://confluence.atlassian.com/bitbucketserver/high-availability-for-bitbucket-server-776640137.html
 

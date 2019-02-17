@@ -4,23 +4,23 @@
 
 \section{Catalogue of Criteria}
 
-For measuring the success of this project afterwards some criteria need to be defined of what should be achieved during this project.
+For measuring the success of this project afterwards, some criteria need to be defined of what should be achieved during this project.
 
 The longterm goal for the car sharing project is to move away from a local setup to a deployment on a cluster with all its components and dependencies.
 
-The first step for that is to outsource the Kafka client from a local setup to a Cloud service. For that the IBM Cloud Message Hub service can be used. This also enables the possibility to send request not only from the local device, on which the car sharing app itself is running, but also from other applications like a mobile device, which is a necessary requirement for a real use of the car sharing app. Because currently there is no clean way of testing the Kafka client also a web application for testing purposes of the Kafka client should be created. This app should be able to produce messages as well as consuming them and printing them on its UI, so that it can be checked if the production of messages is successfull and, that they can be consumed afterwards.
+The first step for that is to outsource the Kafka client from a local setup to a Cloud service. For that the IBM Cloud Message Hub service can be used. This also enables the possibility to send requests not only from the local device, on which the car sharing app itself is running, but also from other applications like a mobile device, which is a necessary requirement for a real use of the car sharing app. Because currently there is no clean way of testing the Kafka client, also a web application for testing purposes of the Kafka client should be created. This app should be able to produce messages as well as consuming them and printing them on its UI, so that it can be checked if the production of messages is successfull and, that they can be consumed afterwards.
 
-After that the DummyScheduler should be deployed on the Cluster. This requires to create a container of the car sharing app. Because the DummyScheduler does not use the cplex engine or any other third party service those dont need to be included to the Docker container.
+After that the DummyScheduler should be deployed on the Cluster. This requires to create a container of the car sharing app. Because the DummyScheduler does not use the \acs{cplex} (\acl{cplex}) engine or any other third party service those dont need to be included to the Docker container.
 
 Because the cluster is an internal Research Cluster there are some differences to "normal" Kubernetes cluster. This causes some additional security stepts to be made for deploying apps on it. These additional stepts should be figured out and documented, so that it can be done with other apps without the need of additional research in the future.
 
 If the DummyScheduler is running on the cluster, all its functionalities are working and the Kafka client is outsourced to the IBM Cloud Message Hub, the project can be considered as successful.
 
-If the deployment of the car sharing app, for example with the real scheduler and its requirements, can get continued beyond that, the project can be considered as overachieved.
+If the deployment of the car sharing app, for example with the real scheduler and its requirements, can be continued beyond that, the project can be considered as overachieved.
 
 \section{Local setup of car sharing app}
 
-For a better understanding of how the car sharing app is working and how the infrastructure for the communication with its underlying services is build up, first the   actual state with local setup of all the single components will be described and explained.
+For a better understanding of how the car sharing app is working and how the infrastructure for the communication with its underlying services is build up, first the actual state with local setup of all the single components will be described and explained.
 
 For enabling all functions of the car sharing app, three services need to be setup beforehand. Those are Apache Kafka, OSRM and Mongo Database. First it will be explained how those services can be setup and what they are needed for.
 
@@ -28,15 +28,15 @@ Apache Kafka needs to run on top of a Apache Zookeeper instance. Zookeeper is a 
 
 %https://www.cloudkarafka.com/blog/2018-07-04-cloudkarafka_what_is_zookeeper.html
 
-The Kafka service as well as the Zookeeper are running inside of two separated docker containers. The kafka container listens on port 9092 for predefined topics. In the case of the car sharing app those topics are ``book'' and ``confirm''. A Kafka client inside the car sharing app provides a producer as well as a consumer. The consumer listens on new messages for the ``book'' topic. This way the app is able to receive booking request for the car sharing service, so that customer can request a ride. This ride needs to be confirmed then, which the producer is for. It can produce messages to the ``confirm'' topic, so that the consumer can be informed about the approval of his ride request and additional information like estimated arriving time or car identification.
+The Kafka service as well as the Zookeeper are running inside of two separated docker containers. The Kafka container listens on port 9092 for predefined topics. In the case of the car sharing app those topics are ``book'' and ``confirm''. A Kafka client inside the car sharing app provides a producer as well as a consumer. The consumer listens on new messages for the ``book'' topic. This way the app is able to receive booking requests for the car sharing service, so that customer can request a ride. This ride needs to be confirmed then, which the producer is for. It can produce messages to the ``confirm'' topic, so that the consumer can be informed about the approval of his ride request and additional information like estimated arriving time or car identification.
 
 For testing the Kafka client within the in this essay described work a test web application was developed. This enables entering a topic, a key and a value and producing a message. This message is then produced by a provided producer.  Also the test apps provides two consumers - one listening on the ``book'' topic, another one listening on the ``confirm'' topic. This way it can be controlled, if all produced messages of this topic are successfully produced to the Kafka service and if they can be consumed by the consumer. All consumed messages are shown directly on the Web UI, which allows dynamic changes via the Python SocketIO library.
 
-The scheduler uses this for listening to requests, calculating the best fitting car and its route and confirming the ride after all calculations have been made. In the current state of the project there are two different Schedulers - first the ``real'' scheduler, which is yet only implemented for a simulation, so that it gets its request from a predefined file instead of a Kafka consumer. The other scheduler is a ``dummy'' scheduler, which is used for a demonstration with a real car, for which no complicated scheduling is necessary, because it is only one car. This ``dummy'' scheduler uses kafka for consuming requests and confirms them directly afterwards with an equal message for the ``confirm'' topic.
+The scheduler uses this for listening to requests, calculating the best fitting car and its route and confirming the ride after all calculations have been made. In the current state of the project there are two different Schedulers - first the ``real'' scheduler, which is yet only implemented for a simulation, so that it gets its request from a predefined file instead of a Kafka consumer. The other scheduler is a ``dummy'' scheduler, which is used for a demonstration with a real car, for which no complicated scheduling is necessary, because it is only one car. This ``dummy'' scheduler uses Kafka for consuming requests and confirms them directly afterwards with an equal message for the ``confirm'' topic.
 
 %check if no kafka client for real scheduler
 
-The second underlying service for the car sharing app is OSRM. As described in chapter INSERT OSRM is for calculating the shortest paths in road networks. For this a map is needed in \acs{PBF} (\acl{PBF}) format. This map then needs to be extracted with a car profile, which determines which routes or streets can be used for this kind of vehicle and which cannot (private road, barriers etc.). This also converts the map into an osrm file. Next this needs to be partitioned into cells and last these cells have to get customized by calculating its routing weights. This OSRM container is also setup within a docker container listening to port 3000 of the localhost for requests for calculating routes on the given map. For running the necessary steps for preparing the map inside the docker container there is a preprocessing shell script prepared, looking like this:
+The second underlying service for the car sharing app is OSRM. As described in chapter 2.4 OSRM is for calculating the shortest paths in road networks. For this a map is needed in \acs{PBF} (\acl{PBF}) format. This map then needs to be extracted with a car profile, which determines which routes or streets can be used for this kind of vehicle and which cannot (private road, barriers etc.). This also converts the map into an osrm file. Next this needs to be partitioned into cells and last these cells have to get customized by calculating its routing weights. This OSRM container is also setup within a docker container listening to port 3000 of the localhost for requests for calculating routes on the given map. For running the necessary steps for preparing the map inside the docker container there is a preprocessing shell script prepared, looking like this:
 
 %https://github.com/Project-OSRM/osrm-backend/wiki/Running-OSRM
 
@@ -51,9 +51,9 @@ docker run -t --rm -v "$(pwd)"/data:/data osrm/osrm-backend osrm-customize /data
 
 The map data are not stored inside the docker container itself but on the local system. This data is then mounted to the docker container, so that it can access it without the need of storing it inside, which keeps the docker container more light weighted.
 
-The third service is a Mongo Database, on which all vehicles, customers, routes and the history are stored. Through this a demo UI can access all necessary informations to represent the vehicles, customers and its calculated routes. This database can be created by a mongo seed, in which all necessary informations are stored in a compact format, so that the database can easily be restored. 
+The third service is a Mongo Database, on which all vehicles, customers, routes and the history are stored. Through this a demo UI can access all necessary informations to represent the vehicles, customers and its calculated routes. This database can be created by a Mongo seed, in which all necessary informations are stored in a compact format, so that the database can easily be restored. 
 
-The MongoDB is also running inside a Docker container. The needed seed data are mounted to the Docker container, so that it can access these data stored on the local machine from within the container. Also the created database is created in a local directory which is then mounted to the Docker container. The database is restored by running a mongo-seed shell script looking like this, which first drops the existing table and then recreate a new one by the stored seed:
+The MongoDB is also running inside a Docker container. The needed seed data are mounted to the Docker container, so that it can access these data stored on the local machine from within the container. Also the created database is created in a local directory which is then mounted to the Docker container. The database is restored by running a Mongo-seed shell script looking like can be seen below, which first drops the existing table and then recreate a new one by the stored seed:
 
 %check tables
 
@@ -68,7 +68,7 @@ This script is executed within the docker container by running this command:
 docker exec -it cs-mongo sh -c "chmod 700 /tmp/seed/mongo-seed.sh && /tmp/seed/mongo-seed.sh"
 \end{lstlisting}
 
-With all those services running now the car sharing app itself can be started. For the DummyScheduler only the Kafka service is needed. For the simulation all of those services are necessary but the Kafka service. How the communication works can be withdrawn by the following figure, which uses the simulation as example application.
+With all those services running now the car sharing app itself can be started. For the DummyScheduler only the Kafka service is needed. For the simulation all of those services are necessary but the Kafka service. How the communication works can be seen in the following figure, which uses the simulation as example application.
 
 \begin{figure}[h]
 \centering
@@ -77,7 +77,7 @@ With all those services running now the car sharing app itself can be started. F
 \textsuperscript{Figure 3.2.1 Simulation communication with services}\\
 \end{figure}
 
-The car sharing simulation needs two components running - first the demo client and second the demo server. The client runs through predefined requests stored in a json file. Those requests are processed by the scheduler, which calculates the route with OSRM. For optimizing the route the cplex engine is used. After completing the calculations the results are written to the mongo database. The demo server consists out of an API, which can be accesses for requesting the current state of all vehicles, customers and calculated routes. For that it connects to the Mongo database and returns the requested data. This is how the simulation can be visualized on a demo UI, which sends requests to the server and represents the current state on a graphical map.
+The car sharing simulation needs two components running - first the demo client and second the demo server. The client runs through predefined requests stored in a json file. Those requests are processed by the scheduler, which calculates the route with OSRM. For optimizing the route the cplex engine is used. After completing the calculations the results are written to the mongo database. The demo server consists out of an API, which can be accessesd for requesting the current state of all vehicles, customers and calculated routes. For that it connects to the Mongo database and returns the requested data. This is how the simulation can be visualized on a demo UI, which sends requests to the server and represents the current state on a graphical map.
 
 %cplex?
 
@@ -85,9 +85,9 @@ The car sharing simulation needs two components running - first the demo client 
 
 The locally running Kafka service has two disadvantages: The first one is, that it needs to be setup along with Zookeeper every time when running the app. For deploying the car sharing app within a cluster on the cloud the Kafka client as well as an underlying Zookeeper would also have to get deployed on it to guarantee the functionality of the car sharing app.
 
-The second problem is, that a local Kafka client can only be accessed from local side. This means, that no messages can be produced to the Kafka client from outside the host, which prevents the car sharing app from receiving customer requests from the outside, for example an app with which the customers can order a ride.
+The second problem is, that a local Kafka client can only be accessed from local side. This means, that no messages can be produced to the Kafka client from outside the host, which prevents the car sharing app from receiving customer requests from the outside, for example with an app, with which the customers can order a ride.
 
-These problems can be solved by outsourcing the 	Kafka client to a Cloud service like the IBM Cloud Message Hub. This service contains a fully managed, highly scalable and high performing Kafka platform. In this chapter it will be described how the configurations of the car sharing kafka client has to be changed, so that it can connect to the IBM Cloud Message Hub.
+These problems can be solved by outsourcing the 	Kafka client to a Cloud service like the IBM Cloud Message Hub. This service contains a fully managed, highly scalable and high performing Kafka platform. In this chapter it will be described how the configurations of the car sharing Kafka client has to be changed, so that it can connect to the IBM Cloud Message Hub.
 
 %https://www.ibm.com/cloud/message-hub???
 
@@ -125,7 +125,7 @@ First the broker is set to the localhost with port 9092 before the booking and c
     KAFKA_GROUP_ID = "group1"
 \end{lstlisting}
 
-First there are the same configurations to be made as for the local client. Only the broker needs to be changed. In this case it takes the broker out of an environment file, in which the url of the broker is defined. Addtionally there are settings for a secure access to the broker, like used security protocol or ssl location. For the identification an API token is used. That's why the username is set to ``token''. The password has to equal the API key in this case, which is also read from the environment file. Both - the API key as well as the broker - can be found on the IBM Cloud Message Hub dashboard. Last there are some more configurations for the API access, version and logging to be made.
+First there are the same configurations to be made as for the local client. Only the broker needs to be changed. In this case it takes the broker out of an environment file, in which the url of the broker is defined. Additionally there are settings for a secure access to the broker, like used security protocol or ssl location. For the identification an API token is used. That's why the username is set to ``token''. The password has to equal the API key in this case, which is also read from the environment file. Both - the API key as well as the broker - can be found on the IBM Cloud Message Hub dashboard. Last there are some more configurations for the API access, version and logging to be made.
 
 These configurations are added as additional configuration mode called ``MessageHubConfig'' in the configuration file. To use these configurations the used mode has to be changed to the newly added ``MessageHubConfig''.
 
@@ -152,7 +152,7 @@ When configuring the Kafka client later in the app sequence it will access this 
         'group.id': config.KAFKA_GROUP_ID,
 \end{lstlisting}
 
-This takes all the configurations made in the CONFIGURATION file and add these to a JSON, which is used for the initialization of the Kafka producer as well as its consumer. After adding these configurations the Kafka client is successfully setup for accessing the IBM Cloud Message Hub Kafka service.
+This takes all the configurations made in the configuration file and add these to a JSON, which is used for the initialization of the Kafka producer as well as its consumer. After adding these configurations the Kafka client is successfully setup for accessing the IBM Cloud Message Hub Kafka service.
 
 \section{Dockerizing car sharing app and underlying technologies}
 
@@ -161,7 +161,7 @@ For deploying the car sharing app and all its underlying technologies on a Kuber
 In every Docker container only one application can be running at the same time. That's why for every application needed for the car sharing app, an own Docker container is needed. That means all in all three Docker containers are needed - one for the MongoDB, one for OSRM and one for the car sharing app itself. 
 To build a Docker container it is necessary to create a Dockerfile. This Dockerfile is usually based on one basic image, like a very light weighted Ubuntu OS, and then every necessary step to be taken before the app can be executed. This includes copying necessary data, setting environment variables, installing necessary compilers and libraries etc. 
 
-For Mongo and OSRM there are already prebuilt Docker containers exisiting. They need to be extended by the necessary data for the car sharing app and the operations needed to be executed on these data. In case of OSRM such a Dockerfile looks like this:
+For Mongo and OSRM there are already prebuilt Docker containers existing. They need to be extended by the necessary data for the car sharing app and the operations to be executed on these data. In case of OSRM such a Dockerfile looks like this:
 
 \begin{lstlisting}
 FROM osrm/osrm-backend
@@ -174,7 +174,7 @@ RUN osrm-customize /opt/new-york.osrm
 CMD ["osrm-routed", "--algorithm", "mld", "/opt/new-york.osrm"]
 \end{lstlisting}
 
-First the base image is defined with the ``FROM'' command. Then the map is copied and the necessary preprocessing commands described in chapter 3.2 are executed. Last the osrm service is started with the prepared map in the ``CMD'' statement.
+First the base image is defined with the ``FROM'' command. Then the map is copied and the necessary preprocessing commands described in chapter 3.2 are executed. Last the OSRM service is started with the prepared map in the ``CMD'' statement.
 
 Extending the Mongo Docker container works similarly:
 
@@ -196,7 +196,7 @@ CMD mongod --fork --logpath /var/log/mongodb.log; \
     docker-entrypoint.sh mongod
 \end{lstlisting}
 
-First the base image is declared. Then the seed folder is copied into the docker container, so that it can use the seed for restoring the database afterwards. Then a few necessary environment variables are set before the ``mongo-seed.sh'' file is set to executable. When starting the mongo database it first runs the ``mongo-seed.sh'' script for restoring the database and creates the necessary index before restarting the mongo database.
+First the base image is declared. Then the seed folder is copied into the docker container, so that it can use the seed for restoring the database afterwards. After that a few necessary environment variables are set before the ``mongo-seed.sh'' file is changed to executable. When starting the Mongo database it first runs the ``mongo-seed.sh'' script for restoring the database and creates the necessary index before restarting the Mongo database.
 
 Last the car sharing app itself needs to be dockerized. For that there is no prebuilt docker container, so this image is based on a light weighted ubuntu version and installs every requirement itself. This Dockerfile looks like this:
 
@@ -226,7 +226,7 @@ WORKDIR /drl-car-sharing/drl_car_sharing/srv
 CMD ["python3", "launch-query-proc.py"]
 \end{lstlisting}
 
-First the \acs{apt} (\acl{apt}) get updated and the locales package gets installed as well as the distribution gets upgraded. Then some environment variables for the pythonpath and the timezone are set before the work directory is created and set. Then all the project files are copied into the docker container except for the not-required files defined in the ``.dockerignore'' file.
+First the \acs{apt} (\acl{apt}) gets updated and the locales package gets installed as well as the distribution gets upgraded. Then some environment variables for the python path and the timezone are set before the work directory is created and set. Then all the project files are copied into the docker container except for the not-required files defined in the ``.dockerignore'' file.
 
 After that python3 gets installed as well as the python package manager \acs{pip} (\acl{pip}).  Then it installs the requirements of this project defined in the ``requirements.txt''. 
 
@@ -254,7 +254,7 @@ After the Docker images are all built they can be pushed to a container registry
 
 \section{Deploying and exposing docker container on cluster}
 
-Before deploying a Docker container on a Kubernetes cluster, the containers need to be pushed to a container registry, from where the cluster can access and pull the image. One possibility is the open platform DockerHub. It is the largest community for container images and for example the base images for mongo and OSRM are already stored on it. The disadvantage is, that they the containers are stored on public servers and even, if they can be set to private containers, unpermitted access to the data can not be guaranteed. 
+Before deploying a Docker container on a Kubernetes cluster, the containers need to be pushed to a container registry, from where the cluster can access and pull the image. One possibility is the open platform DockerHub. It is the largest community for container images and for example the base images for Mongo and OSRM are already stored on it. The disadvantage is, that they the containers are stored on public servers and even, if they can be set to private containers, preventing unpermitted access to the data can not be guaranteed. 
 
 That's why for confidential data private container registries are usually preferred. In case of the car sharing project this is the IBM Cloud container registry. To push a container to this registry it needs to be correctly tagged. For that the tag needs to start with \textit{registry.<region>.bluemix.net/<namespace>}. The \textit{<region>} placeholder has to be replaced with the location of the used container registry, for example ``eu-de''. In those container registry services of IBM cloud there can be created different namespaces. For defining them in the tag the \textit{<namespace>} placeholder has to be replaced with the chosen namespace. The docker image with id \textit{<image-id>} can be tagged with
 
@@ -265,10 +265,10 @@ docker tag <image-id> registry.eu-de.bluemix.net/<your-namespace>/<name-of-image
 Before pushing the container the user has to be logged in to IBM Cloud \acs{CLI} (\acl{CLI}) and an account, a region and a Cloud space has to be chosen. After that it can be pushed with the docker push command and the newly generated tag:
 
 \begin{lstlisting}
-docker push <image-id> registry.eu-de.bluemix.net/<your-namespace>/<name-of-image>
+docker push registry.eu-de.bluemix.net/<your-namespace>/<name-of-image>
 \end{lstlisting}
 
-Now the docker image is ready to get deployed on the Kubernetes cluster. This has to be repeated for every docker container to be deployed. This means in case of the car sharing project this has to be done for the extended mongo and osrm docker container as well as the car sharing containers for the simulation as well as the scheduler component itself. For deploying those containers to the cluster a deployment.yaml file is needed. Before that a secret for pulling the image from the cloud registry needs to be created beforehand. When a secret is created it needs to be defined in the deployment.yaml along with other properties. All in all this file has to look like below:
+Now the docker image is ready to get deployed on the Kubernetes cluster. This has to be repeated for every docker container to be deployed. This means in case of the car sharing project this has to be done for the extended Mongo and OSRM docker containers as well as the car sharing containers for the simulation as well as the scheduler component itself. For deploying those containers to the cluster a deployment.yaml file is needed. Before that a secret for pulling the image from the cloud registry needs to be created. When a secret is created it needs to be defined in the deployment.yaml along with other properties. All in all this file has to look like below:
 
 \begin{lstlisting}
 apiVersion: extensions/v1beta1
@@ -299,7 +299,7 @@ spec:
       - name: <name-of-secret>
 \end{lstlisting}
 
-In this example deployment.yaml several properties needs to be changed. First, the <name-of-deployment> placeholders have to be set to the name, which the deployment itself will get. The <tag-of-container> placeholder has to equal the tag with which the container was tagged before. The <name-of-secret> field has to be the name of the created secret for the container registry. Last the resources has to get defined. The requested resources are the resources, which the deployment always request from the cluster, so that those are always accessible and reserved for this specific deployment. If they need more, they can request more but only up to the limit defined in the limits section.
+In this example deployment.yaml several properties needs to be changed. First, the <name-of-deployment> placeholders have to be set to the name, which the deployment itself will get. The <tag-of-container> placeholder has to equal the tag with which the container was tagged before. The <name-of-secret> field has to be the name of your secret for the container registry. Last the resources has to get defined. The requested resources are the resources, which the deployment always request from the cluster, so that those are always accessible and reserved for this specific deployment. If they need more, they can request more but only up to the limit defined in the limits section.
 
 Such a yaml file has to be created for every deployment - this means for Mongo, OSRM and every car sharing component, so the DummyScheduler and the simulation client as well as the simulation server. Before creating these deployments on the cluster kubectl has to be configured with the KUBECONFIG as described in chapter 2.2. After that they can be deployed with the command
 
